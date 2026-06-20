@@ -12,8 +12,11 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-# CORS Configuration - Allow all origins during development
-CORS_ORIGINS = ["*"]
-
-# For production, use specific origins:
-# CORS_ORIGINS = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000"]
+# CORS Configuration
+# In production, set CORS_ORIGINS env var to your frontend URL (comma-separated)
+_cors_origins_env = os.getenv("CORS_ORIGINS", "")
+if _cors_origins_env:
+    CORS_ORIGINS = [origin.strip() for origin in _cors_origins_env.split(",") if origin.strip()]
+else:
+    # Allow all origins during development
+    CORS_ORIGINS = ["*"]
