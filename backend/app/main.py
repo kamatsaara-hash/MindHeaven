@@ -18,9 +18,20 @@ app = FastAPI(
 )
 
 # CORS middleware
+# When using wildcard "*", credentials must be False per CORS spec.
+# When using specific origins, credentials can be True.
+_allow_credentials = "*" not in CORS_ORIGINS
+
+# Always include the deployed frontend URL
+_origins = CORS_ORIGINS if "*" not in CORS_ORIGINS else [
+    "https://mindheaven-frontend.onrender.com",
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
