@@ -208,8 +208,7 @@ const ProfessionalHelpPage = () => {
         <motion.div
           variants={staggerContainer}
           initial="initial"
-          whileInView="animate"
-          viewport={{ once: true }}
+          animate="animate"
           className="grid md:grid-cols-2 gap-6"
         >
           {isLoading ? (
