@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, Mail, Star, X, Clock, DollarSign, Award, BookOpen, MessageSquare } from 'lucide-react'
+import { Phone, Mail, Star, X, Clock, IndianRupee, Award, BookOpen, MessageSquare } from 'lucide-react'
 import { Card, Badge } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { staggerContainer, fadeInUp } from '@/animations/variants'
@@ -256,8 +256,8 @@ const ProfessionalHelpPage = () => {
                 <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
                   {counselor.hourly_rate > 0 && (
                     <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
-                      <DollarSign className="w-4 h-4" />
-                      <span>${counselor.hourly_rate}/hr</span>
+                      <IndianRupee className="w-4 h-4" />
+                      <span>₹{counselor.hourly_rate}/hr</span>
                     </div>
                   )}
                   <div className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
@@ -430,8 +430,8 @@ const ProfessionalHelpPage = () => {
                         )}
                         {selectedCounselor.hourly_rate > 0 && (
                           <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 pt-2 border-t border-slate-200 dark:border-slate-700">
-                            <DollarSign className="w-5 h-5 text-lavender-500" />
-                            <span className="font-semibold">${selectedCounselor.hourly_rate}/hour</span>
+                            <IndianRupee className="w-5 h-5 text-lavender-500" />
+                            <span className="font-semibold">₹{selectedCounselor.hourly_rate}/hour</span>
                           </div>
                         )}
                       </div>

@@ -391,7 +391,7 @@ export default function CounselorManagement() {
                     </div>
                     <div className="bg-lavender-50 dark:bg-lavender-500/10 rounded-lg p-4">
                       <p className="text-sm text-slate-600 dark:text-slate-400">Hourly Rate</p>
-                      <p className="text-2xl font-bold text-lavender-600">${selectedCounselor.hourly_rate || selectedCounselor.hourlyRate || 'N/A'}</p>
+                      <p className="text-2xl font-bold text-lavender-600">₹{selectedCounselor.hourly_rate || selectedCounselor.hourlyRate || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -487,7 +487,7 @@ export default function CounselorManagement() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Hourly Rate ($)</label>
+                    <label className="block text-sm font-medium mb-1">Hourly Rate (₹)</label>
                     <input type="number" min={0} value={newCounselor.hourly_rate} onChange={(e) => setNewCounselor({...newCounselor, hourly_rate: parseInt(e.target.value) || 0})} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500" />
                   </div>
                   <div>
