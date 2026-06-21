@@ -61,9 +61,6 @@ const ProfilePage = () => {
               {user?.isAnonymous ? 'Anonymous' : 'Verified'}
             </Badge>
             {user?.email && <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{user.email}</p>}
-            <Button variant="primary" size="sm" className="w-full">
-              Edit Profile
-            </Button>
           </Card>
         </motion.div>
 
