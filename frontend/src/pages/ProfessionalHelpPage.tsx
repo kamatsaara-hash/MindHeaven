@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Phone, Mail, MapPin, Star, X, Clock, DollarSign, Award, BookOpen } from 'lucide-react'
+import { Phone, Mail, Star, X, Clock, DollarSign, Award, BookOpen, MessageSquare } from 'lucide-react'
 import { Card, Badge } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { staggerContainer, fadeInUp } from '@/animations/variants'
@@ -13,13 +13,21 @@ const ProfessionalHelpPage = () => {
   const [counselors, setCounselors] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [selectedSpecialization, setSelectedSpecialization] = useState<string | null>(null)
-  
+
   const { user } = useAuth()
   const [isBooking, setIsBooking] = useState(false)
   const [bookingDate, setBookingDate] = useState('2024-05-24')
   const [bookingTime, setBookingTime] = useState('10:00 AM')
   const [bookingNotes, setBookingNotes] = useState('Regular session')
   const [isBookingLoading, setIsBookingLoading] = useState(false)
+
+  // Review state
+  const [reviews, setReviews] = useState<any[]>([])
+  const [isReviewing, setIsReviewing] = useState(false)
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewComment, setReviewComment] = useState('')
+  const [hoverRating, setHoverRating] = useState(0)
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
 
   useEffect(() => {
     const fetchCounselors = async () => {
@@ -34,6 +42,49 @@ const ProfessionalHelpPage = () => {
     }
     fetchCounselors()
   }, [])
+
+  const openCounselor = async (counselor: any) => {
+    setSelectedCounselor(counselor)
+    setIsBooking(false)
+    setIsReviewing(false)
+    setReviewRating(5)
+    setReviewComment('')
+    try {
+      const data = await publicService.getReviews(counselor.id)
+      setReviews(data)
+    } catch {
+      setReviews([])
+    }
+  }
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedCounselor || !user) return
+    setIsSubmittingReview(true)
+    try {
+      await publicService.submitReview(selectedCounselor.id, {
+        user_id: user.id,
+        user_nickname: user.nickname || 'Anonymous',
+        rating: reviewRating,
+        comment: reviewComment
+      })
+      toast.success('Review submitted!')
+      const data = await publicService.getReviews(selectedCounselor.id)
+      setReviews(data)
+      setIsReviewing(false)
+      setReviewComment('')
+      setReviewRating(5)
+      // Update counselor rating locally
+      if (data.length > 0) {
+        const avg = data.reduce((s: number, r: any) => s + r.rating, 0) / data.length
+        setSelectedCounselor((prev: any) => ({ ...prev, rating: parseFloat(avg.toFixed(1)), reviews: data.length }))
+      }
+    } catch {
+      toast.error('Failed to submit review.')
+    } finally {
+      setIsSubmittingReview(false)
+    }
+  }
 
   const handleConfirmBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -216,7 +267,7 @@ const ProfessionalHelpPage = () => {
                   </div>
                 </div>
 
-                <Button variant="outline" size="sm" className="w-full" onClick={() => setSelectedCounselor(counselor)}>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => openCounselor(counselor)}>
                   View Full Profile
                 </Button>
               </Card>
@@ -394,7 +445,81 @@ const ProfessionalHelpPage = () => {
                       </div>
                     </div>
 
-                    <div className="mt-8 pt-6 border-t border-slate-200 dark:border-slate-800 flex gap-3">
+                    {/* Reviews Section */}
+                    <div className="mt-2">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold flex items-center gap-2">
+                          <MessageSquare className="w-5 h-5" />
+                          Reviews ({reviews.length})
+                        </h3>
+                        {user && !user.is_anonymous && (
+                          <Button size="sm" variant="outline" onClick={() => setIsReviewing(v => !v)}>
+                            {isReviewing ? 'Cancel' : '+ Write Review'}
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* Review Form */}
+                      {isReviewing && (
+                        <form onSubmit={handleSubmitReview} className="mb-4 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl space-y-3">
+                          <div>
+                            <p className="text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Your Rating</p>
+                            <div className="flex gap-1">
+                              {[1,2,3,4,5].map(star => (
+                                <button
+                                  key={star}
+                                  type="button"
+                                  onClick={() => setReviewRating(star)}
+                                  onMouseEnter={() => setHoverRating(star)}
+                                  onMouseLeave={() => setHoverRating(0)}
+                                  className="p-0.5 transition-transform hover:scale-110"
+                                >
+                                  <Star className={`w-6 h-6 ${
+                                    star <= (hoverRating || reviewRating)
+                                      ? 'fill-yellow-400 text-yellow-400'
+                                      : 'text-slate-300'
+                                  }`} />
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <div>
+                            <textarea
+                              value={reviewComment}
+                              onChange={e => setReviewComment(e.target.value)}
+                              placeholder="Share your experience..."
+                              rows={3}
+                              className="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white"
+                            />
+                          </div>
+                          <Button type="submit" size="sm" className="bg-lavender-600 hover:bg-lavender-700 text-white border-none w-full" isLoading={isSubmittingReview}>
+                            Submit Review
+                          </Button>
+                        </form>
+                      )}
+
+                      {/* Review List */}
+                      <div className="space-y-3 max-h-48 overflow-y-auto pr-1">
+                        {reviews.length === 0 ? (
+                          <p className="text-sm text-slate-500 text-center py-4">No reviews yet. Be the first to review!</p>
+                        ) : reviews.map((r: any) => (
+                          <div key={r.id} className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm font-medium">{r.user_nickname}</span>
+                              <div className="flex gap-0.5">
+                                {[1,2,3,4,5].map(s => (
+                                  <Star key={s} className={`w-3 h-3 ${s <= r.rating ? 'fill-yellow-400 text-yellow-400' : 'text-slate-300'}`} />
+                                ))}
+                              </div>
+                            </div>
+                            {r.comment && <p className="text-sm text-slate-600 dark:text-slate-400">{r.comment}</p>}
+                            <p className="text-xs text-slate-400 mt-1">{new Date(r.created_at).toLocaleDateString()}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 flex gap-3">
                       <Button variant="primary" className="flex-1" onClick={() => setIsBooking(true)}>
                         Schedule Session
                       </Button>

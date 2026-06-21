@@ -104,3 +104,50 @@ async def get_counselors_by_specialization(specialization: str):
             "hourly_rate": c.get("hourly_rate", 0)
         })
     return formatted
+
+
+class ReviewCreate(BaseModel):
+    user_id: str
+    user_nickname: str
+    rating: int  # 1-5
+    comment: str = ""
+
+@router.post("/counselors/{counselor_id}/reviews")
+async def submit_review(counselor_id: str, review: ReviewCreate):
+    """Submit a review for a counselor"""
+    counselor = db.users.find_one({"id": counselor_id, "role": "counselor"}, {"_id": False})
+    if not counselor:
+        return {"error": "Counselor not found"}
+
+    rating = max(1, min(5, review.rating))
+    review_doc = {
+        "id": str(uuid.uuid4()),
+        "counselor_id": counselor_id,
+        "user_id": review.user_id,
+        "user_nickname": review.user_nickname,
+        "rating": rating,
+        "comment": review.comment,
+        "created_at": datetime.utcnow()
+    }
+    db.counselor_reviews.insert_one(review_doc)
+
+    # Recalculate average rating
+    all_reviews = list(db.counselor_reviews.find({"counselor_id": counselor_id}))
+    avg_rating = sum(r["rating"] for r in all_reviews) / len(all_reviews)
+    db.users.update_one(
+        {"id": counselor_id},
+        {"$set": {"rating": round(avg_rating, 1), "reviews": len(all_reviews)}}
+    )
+    return {"message": "Review submitted successfully", "review_id": review_doc["id"]}
+
+@router.get("/counselors/{counselor_id}/reviews")
+async def get_reviews(counselor_id: str):
+    """Get all reviews for a counselor"""
+    reviews = list(db.counselor_reviews.find(
+        {"counselor_id": counselor_id},
+        {"_id": False}
+    ).sort("created_at", -1))
+    for r in reviews:
+        if isinstance(r.get("created_at"), datetime):
+            r["created_at"] = r["created_at"].isoformat()
+    return reviews

@@ -223,8 +223,8 @@ def create_counselor(counselor_data: dict):
         "reviews": 0,
         "sessions_completed": 0,
         "hourly_rate": counselor_data.get("hourly_rate", 0),
-        "status": "Pending Verification",
-        "verified": False,
+        "status": "Verified",
+        "verified": True,
         "created_at": datetime.utcnow(),
         "updated_at": datetime.utcnow()
     })

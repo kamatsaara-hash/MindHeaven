@@ -41,5 +41,25 @@ export const publicService = {
       console.error("Error booking appointment:", error)
       throw error
     }
+  },
+
+  getReviews: async (counselorId: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/counselors/${counselorId}/reviews`)
+      return response.data
+    } catch (error) {
+      console.error("Error fetching reviews:", error)
+      throw error
+    }
+  },
+
+  submitReview: async (counselorId: string, reviewData: { user_id: string, user_nickname: string, rating: number, comment: string }) => {
+    try {
+      const response = await axios.post(`${API_URL}/counselors/${counselorId}/reviews`, reviewData)
+      return response.data
+    } catch (error) {
+      console.error("Error submitting review:", error)
+      throw error
+    }
   }
 }
