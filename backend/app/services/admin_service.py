@@ -418,13 +418,19 @@ def get_appointments():
             if not apt.get("time_str"):
                 time_str = apt_date.strftime("%I:%M %p")
         
+        apt_status = apt.get("status", "Pending Approval")
+        if apt_status in ["Upcoming", "Pending Approval", "scheduled", "Pending"]:
+            if isinstance(apt_date, datetime) and apt_date < datetime.utcnow():
+                apt_status = "Completed"
+                db.appointments.update_one({"id": apt.get("id")}, {"$set": {"status": "Completed"}})
+
         formatted.append({
             "id": apt.get("id"),
             "user": user_name,
             "counselor": counselor_name,
             "date": date_str,
             "time": time_str,
-            "status": apt.get("status", "Pending Approval"),
+            "status": apt_status,
             "type": "Video Call"
         })
     return formatted
