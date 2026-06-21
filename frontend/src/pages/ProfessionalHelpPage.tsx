@@ -452,7 +452,7 @@ const ProfessionalHelpPage = () => {
                           <MessageSquare className="w-5 h-5" />
                           Reviews ({reviews.length})
                         </h3>
-                        {user && !user.is_anonymous && (
+                        {user && !user.isAnonymous && (
                           <Button size="sm" variant="outline" onClick={() => setIsReviewing(v => !v)}>
                             {isReviewing ? 'Cancel' : '+ Write Review'}
                           </Button>
