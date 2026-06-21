@@ -17,6 +17,7 @@ const Navbar = () => {
     { label: 'Resources', path: '/resources' },
     { label: 'Professional Help', path: '/professional-help' },
     { label: 'Dashboard', path: '/dashboard' },
+    { label: 'My Profile', path: '/profile' },
     { label: 'Report User', path: '/report-user' },
   ]
 
@@ -61,10 +62,11 @@ const Navbar = () => {
               {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
 
-            {/* Auth buttons */}
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm font-medium">{user?.nickname}</span>
+                <Link to="/profile" className="text-sm font-medium hover:text-lavender-600 dark:hover:text-lavender-400 transition-colors">
+                  {user?.nickname}
+                </Link>
                 <Button
                   variant="ghost"
                   size="sm"
