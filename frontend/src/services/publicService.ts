@@ -61,5 +61,15 @@ export const publicService = {
       console.error("Error submitting review:", error)
       throw error
     }
+  },
+
+  getUserAppointments: async (userId: string) => {
+    try {
+      const response = await axios.get(`${API_URL}/users/${userId}/appointments`)
+      return response.data
+    } catch (error) {
+      console.error("Error fetching user appointments:", error)
+      throw error
+    }
   }
 }

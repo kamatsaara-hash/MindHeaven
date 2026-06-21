@@ -1,10 +1,36 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { Card } from '@/components/ui/Card'
+import { Card, Badge } from '@/components/ui/Card'
 import { staggerContainer, fadeInUp } from '@/animations/variants'
+import { useAuth } from '@/context/AuthContext'
+import { publicService } from '@/services/publicService'
+import { Calendar, Clock, Video, AlertCircle } from 'lucide-react'
 
 const DashboardPage = () => {
+  const { user } = useAuth()
+  const [appointments, setAppointments] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (user?.id) {
+      setLoading(true)
+      publicService.getUserAppointments(user.id)
+        .then((data) => {
+          setAppointments(data)
+          setError(null)
+        })
+        .catch((err) => {
+          console.error("Error loading appointments:", err)
+          setError("Failed to load appointments. Please try again later.")
+        })
+        .finally(() => {
+          setLoading(false)
+        })
+    }
+  }, [user])
+
   const stats = [
     { label: 'Total Posts', value: 1243, change: '+12%' },
     { label: 'Community Members', value: 5847, change: '+8%' },
@@ -56,6 +82,100 @@ const DashboardPage = () => {
             </Card>
           </motion.div>
         ))}
+      </motion.div>
+
+      {/* My Appointments */}
+      <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="mb-12">
+        <Card variant="glass">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-lavender-500/10 text-lavender-500">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">My Scheduled Sessions</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Track and manage your upcoming and past counseling sessions</p>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lavender-500"></div>
+              <p className="text-sm text-slate-500">Retrieving your appointments...</p>
+            </div>
+          ) : error ? (
+            <div className="flex items-center gap-2 p-4 text-red-700 bg-red-100 dark:text-red-300 dark:bg-red-900/20 rounded-xl">
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p className="text-sm">{error}</p>
+            </div>
+          ) : appointments.length === 0 ? (
+            <div className="text-center py-12 bg-slate-500/5 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+              <Calendar className="w-12 h-12 text-slate-400 mx-auto mb-3 opacity-50" />
+              <p className="font-medium text-slate-700 dark:text-slate-300 mb-1">No sessions booked yet</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+                Need professional guidance? Book a private, confidential session with our certified counselors.
+              </p>
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-6">
+              {appointments.map((appointment) => {
+                let badgeVariant: 'default' | 'success' | 'warning' | 'error' | 'info' = 'default'
+                const statusLower = appointment.status?.toLowerCase() || ''
+                if (statusLower.includes('approve') || statusLower.includes('pending')) {
+                  badgeVariant = 'warning'
+                } else if (statusLower.includes('upcoming') || statusLower.includes('scheduled')) {
+                  badgeVariant = 'info'
+                } else if (statusLower.includes('completed')) {
+                  badgeVariant = 'success'
+                } else if (statusLower.includes('decline') || statusLower.includes('cancel')) {
+                  badgeVariant = 'error'
+                }
+
+                return (
+                  <motion.div
+                    key={appointment.id}
+                    whileHover={{ scale: 1.01 }}
+                    className="p-5 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-white/30 dark:bg-slate-900/30 backdrop-blur-sm flex flex-col justify-between"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-xs font-semibold tracking-wider uppercase text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                          <Video className="w-3.5 h-3.5 text-lavender-500" />
+                          {appointment.type || 'Video Session'}
+                        </span>
+                        <Badge variant={badgeVariant} size="sm">
+                          {appointment.status}
+                        </Badge>
+                      </div>
+
+                      <h4 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-3">
+                        {appointment.counselor_name}
+                      </h4>
+
+                      <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400 mb-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-lavender-500" />
+                          <span>{appointment.date}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-soft-teal-500" />
+                          <span>{appointment.time}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {appointment.notes && (
+                      <div className="mt-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                        <p className="text-xs italic text-slate-500 dark:text-slate-400 line-clamp-2">
+                          Note: {appointment.notes}
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                )
+              })}
+            </div>
+          )}
+        </Card>
       </motion.div>
 
       {/* Charts */}

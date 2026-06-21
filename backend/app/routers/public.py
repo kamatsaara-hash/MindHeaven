@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from app.database.database import db
 
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timedelta
 import uuid
 
 router = APIRouter(prefix="/public", tags=["public"])
@@ -163,3 +163,46 @@ async def get_reviews(counselor_id: str):
         if isinstance(r.get("created_at"), datetime):
             r["created_at"] = r["created_at"].isoformat()
     return reviews
+
+
+@router.get("/users/{user_id}/appointments")
+async def get_user_appointments(user_id: str):
+    """Get all appointments for a specific user"""
+    appointments = list(db.appointments.find({"user_id": user_id}).sort("appointment_date", -1))
+    formatted = []
+    for apt in appointments:
+        # Fetch counselor details
+        counselor = db.users.find_one({"id": apt.get("counselor_id")})
+        counselor_name = "Unknown Counselor"
+        if counselor:
+            counselor_name = counselor.get("nickname") or counselor.get("email") or "Unknown Counselor"
+        
+        # Format date & time
+        apt_date = apt.get("appointment_date")
+        date_str = "Unknown Date"
+        time_str = apt.get("time_str") or "Unknown Time"
+        
+        if isinstance(apt_date, datetime):
+            date_str = apt_date.strftime("%B %d, %Y")
+            if not apt.get("time_str"):
+                time_str = apt_date.strftime("%I:%M %p")
+                
+        # Auto-complete status for past sessions
+        apt_status = apt.get("status", "Pending Approval")
+        current_ist_time = datetime.utcnow() + timedelta(hours=5, minutes=30)
+        if apt_status in ["Upcoming", "Pending Approval", "scheduled", "Pending"]:
+            if isinstance(apt_date, datetime) and apt_date < current_ist_time:
+                apt_status = "Completed"
+                db.appointments.update_one({"id": apt.get("id")}, {"$set": {"status": "Completed"}})
+
+        formatted.append({
+            "id": apt.get("id"),
+            "counselor_id": apt.get("counselor_id"),
+            "counselor_name": counselor_name,
+            "date": date_str,
+            "time": time_str,
+            "status": apt_status,
+            "notes": apt.get("notes", ""),
+            "type": "Video Call"
+        })
+    return formatted
