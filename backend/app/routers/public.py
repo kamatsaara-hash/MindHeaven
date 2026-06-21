@@ -32,7 +32,7 @@ async def create_public_appointment(payload: AppointmentCreate):
     if existing:
         raise HTTPException(
             status_code=400,
-            detail="This slot is already booked for this counselor. Please choose another time."
+            detail="Appointment not available at that time. Try a different slot."
         )
 
     db.appointments.insert_one({
