@@ -16,10 +16,35 @@ const ProfessionalHelpPage = () => {
 
   const { user } = useAuth()
   const [isBooking, setIsBooking] = useState(false)
-  const [bookingDate, setBookingDate] = useState('2024-05-24')
+  const [bookingDate, setBookingDate] = useState('2026-06-21')
   const [bookingTime, setBookingTime] = useState('10:00 AM')
   const [bookingNotes, setBookingNotes] = useState('Regular session')
   const [isBookingLoading, setIsBookingLoading] = useState(false)
+
+  const years = ['2026', '2027', '2028']
+  const months = [
+    { label: 'January', value: '01' },
+    { label: 'February', value: '02' },
+    { label: 'March', value: '03' },
+    { label: 'April', value: '04' },
+    { label: 'May', value: '05' },
+    { label: 'June', value: '06' },
+    { label: 'July', value: '07' },
+    { label: 'August', value: '08' },
+    { label: 'September', value: '09' },
+    { label: 'October', value: '10' },
+    { label: 'November', value: '11' },
+    { label: 'December', value: '12' },
+  ]
+  const days = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'))
+
+  const [selectedYear, setSelectedYear] = useState('2026')
+  const [selectedMonth, setSelectedMonth] = useState('06')
+  const [selectedDay, setSelectedDay] = useState('21')
+
+  useEffect(() => {
+    setBookingDate(`${selectedYear}-${selectedMonth}-${selectedDay}`)
+  }, [selectedYear, selectedMonth, selectedDay])
 
   // Review state
   const [reviews, setReviews] = useState<any[]>([])
@@ -311,23 +336,45 @@ const ProfessionalHelpPage = () => {
                       />
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-4">
                       <div>
-                        <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Date</label>
-                        <input 
-                          type="date" 
-                          required
-                          value={bookingDate} 
-                          onChange={(e) => setBookingDate(e.target.value)} 
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white"
-                        />
+                        <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Date</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <select
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white text-sm cursor-pointer"
+                          >
+                            {months.map(m => (
+                              <option key={m.value} value={m.value}>{m.label}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={selectedDay}
+                            onChange={(e) => setSelectedDay(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white text-sm cursor-pointer"
+                          >
+                            {days.map(d => (
+                              <option key={d} value={d}>{parseInt(d)}</option>
+                            ))}
+                          </select>
+                          <select
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                            className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white text-sm cursor-pointer"
+                          >
+                            {years.map(y => (
+                              <option key={y} value={y}>{y}</option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1 text-slate-700 dark:text-slate-300">Time</label>
                         <select 
                           value={bookingTime} 
                           onChange={(e) => setBookingTime(e.target.value)} 
-                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white"
+                          className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-lavender-500 text-slate-900 dark:text-white cursor-pointer"
                         >
                           <option value="09:00 AM">09:00 AM</option>
                           <option value="10:00 AM">10:00 AM</option>

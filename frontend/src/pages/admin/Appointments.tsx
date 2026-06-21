@@ -38,9 +38,9 @@ export default function Appointments() {
           }
         } else {
           setAppointments([
-            { id: 1, user: 'Alice Smith', counselor: 'Dr. Sarah Jenkins', date: 'May 23, 2024', time: '10:00 AM', status: 'Upcoming', type: 'Video Call' },
-            { id: 2, user: 'Jane Doe', counselor: 'Dr. Emily Chen', date: 'May 23, 2024', time: '02:30 PM', status: 'Pending Approval', type: 'Audio Call' },
-            { id: 3, user: 'Bob Johnson', counselor: 'Dr. Sarah Jenkins', date: 'May 22, 2024', time: '09:00 AM', status: 'Completed', type: 'Video Call' },
+            { id: 1, user: 'Alice Smith', counselor: 'Dr. Sarah Jenkins', date: 'May 23, 2026', time: '10:00 AM', status: 'Upcoming', type: 'Video Call' },
+            { id: 2, user: 'Jane Doe', counselor: 'Dr. Emily Chen', date: 'May 23, 2026', time: '02:30 PM', status: 'Pending Approval', type: 'Audio Call' },
+            { id: 3, user: 'Bob Johnson', counselor: 'Dr. Sarah Jenkins', date: 'May 22, 2026', time: '09:00 AM', status: 'Completed', type: 'Video Call' },
           ]);
         }
       } finally {
