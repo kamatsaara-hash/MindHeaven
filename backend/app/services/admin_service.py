@@ -419,8 +419,9 @@ def get_appointments():
                 time_str = apt_date.strftime("%I:%M %p")
         
         apt_status = apt.get("status", "Pending Approval")
+        current_ist_time = datetime.utcnow() + timedelta(hours=5, minutes=30)
         if apt_status in ["Upcoming", "Pending Approval", "scheduled", "Pending"]:
-            if isinstance(apt_date, datetime) and apt_date < datetime.utcnow():
+            if isinstance(apt_date, datetime) and apt_date < current_ist_time:
                 apt_status = "Completed"
                 db.appointments.update_one({"id": apt.get("id")}, {"$set": {"status": "Completed"}})
 
