@@ -43,12 +43,12 @@ async def get_verified_counselors():
     for c in counselors:
         formatted.append({
             "id": c.get("id"),
-            "name": c.get("nickname") or c.get("email"),
+            "name": c.get("nickname") or c.get("name") or c.get("email") or "Unknown Counselor",
             "email": c.get("email"),
             "specialization": c.get("specialization", "General"),
             "bio": c.get("bio", "Licensed professional ready to help you navigate life's challenges."),
             "qualifications": c.get("qualifications", []),
-            "rating": c.get("rating", 4.5),
+            "rating": c.get("rating") if c.get("rating") is not None else 0,
             "reviews": c.get("reviews", 0),
             "verified": True,
             "phone": c.get("phone", "Available on profile"),

@@ -250,7 +250,7 @@ const ProfessionalHelpPage = () => {
                       />
                     ))}
                   </div>
-                  <span className="text-sm font-medium">{counselor.rating.toFixed(1)}</span>
+                  <span className="text-sm font-medium">{(counselor.rating ?? 0).toFixed(1)}</span>
                   <span className="text-xs text-slate-500">({counselor.reviews} reviews)</span>
                 </div>
 
@@ -371,7 +371,7 @@ const ProfessionalHelpPage = () => {
                           ))}
                         </div>
                         <div>
-                          <p className="font-semibold">{selectedCounselor.rating.toFixed(1)} out of 5</p>
+                        <p className="font-semibold">{(selectedCounselor.rating ?? 0).toFixed(1)} out of 5</p>
                           <p className="text-sm text-slate-600 dark:text-slate-400">{selectedCounselor.reviews} client reviews</p>
                         </div>
                       </div>
