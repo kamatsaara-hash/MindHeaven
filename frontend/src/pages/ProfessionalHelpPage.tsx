@@ -102,9 +102,10 @@ const ProfessionalHelpPage = () => {
       toast.success('Session scheduled successfully! Pending admin approval.');
       setSelectedCounselor(null);
       setIsBooking(false);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to book appointment:', err);
-      toast.error('Failed to book appointment. Please try again.');
+      const detail = err.response?.data?.detail || 'Failed to book appointment. Please try again.';
+      toast.error(detail);
     } finally {
       setIsBookingLoading(false);
     }

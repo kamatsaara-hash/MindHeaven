@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from app.database.database import db
 
 from pydantic import BaseModel
@@ -22,6 +22,18 @@ async def create_public_appointment(payload: AppointmentCreate):
         appointment_date = datetime.strptime(dt_str, "%Y-%m-%d %I:%M %p")
     except Exception:
         appointment_date = datetime.utcnow()
+
+    # Check for slot availability
+    existing = db.appointments.find_one({
+        "counselor_id": payload.counselor_id,
+        "appointment_date": appointment_date,
+        "status": {"$nin": ["Declined", "declined", "Cancelled", "cancelled"]}
+    })
+    if existing:
+        raise HTTPException(
+            status_code=400,
+            detail="This slot is already booked for this counselor. Please choose another time."
+        )
 
     db.appointments.insert_one({
         "id": new_id,
