@@ -223,7 +223,7 @@ export default function Appointments() {
                   </div>
                   <div>
                     <label className="block text-xs font-medium text-slate-500">Session Rate</label>
-                    <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mt-0.5">$120 / hour</p>
+                    <p className="text-sm font-medium text-slate-800 dark:text-slate-200 mt-0.5">₹1,500 / hour</p>
                   </div>
                 </div>
 
