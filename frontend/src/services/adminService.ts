@@ -1,7 +1,7 @@
 // Service for Admin API endpoints connecting to FastAPI backend
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8000/api/admin'
+const API_URL = 'https://mindheaven-tfbc.onrender.com/api/admin'
 
 export const adminService = {
   // Dashboard Stats

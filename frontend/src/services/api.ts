@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import type { PaginatedResponse, Post, Comment, Resource, Counselor, DashboardStats } from '@/types'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://mindheaven-tfbc.onrender.com/api'
 
 class ApiService {
   private api: AxiosInstance

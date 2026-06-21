@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_URL = 'http://localhost:8000/api/public'
+const API_URL = 'https://mindheaven-tfbc.onrender.com/api/public'
 
 export const publicService = {
   getCounselors: async () => {
